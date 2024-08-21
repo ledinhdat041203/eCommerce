@@ -14,4 +14,18 @@ require("./dbs/mongodb");
 //router
 app.use("", require("./routers"));
 
+//handle error
+app.use((req, res, next) => {
+  const err = new Error("Not found");
+  err.status = 404;
+  return next(err);
+});
+
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  return res
+    .status(status)
+    .json({ status, message: err.message || "Internal server error" });
+});
+
 module.exports = app;

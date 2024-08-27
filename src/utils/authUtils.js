@@ -1,27 +1,20 @@
 "use strict";
 const JWT = require("jsonwebtoken");
-const createTokenPair = async (payload, privateKey) => {
+const crypto = require("crypto");
+
+const createTokenPair = async (payload, publicKey, privateKey) => {
   try {
     //access token
-    const accessToken = await JWT.sign(payload, privateKey, {
-      algorithm: "RS256",
+    const accessToken = await JWT.sign(payload, publicKey, {
+      algorithm: "HS256",
       expiresIn: "1h",
     });
 
     //refresh token
     const refreshToken = await JWT.sign(payload, privateKey, {
-      algorithm: "RS256",
+      algorithm: "HS256",
       expiresIn: "30d",
     });
-
-    //verify
-    // JWT.verify(accessToken, publicKey, (err, decode) => {
-    //   if (err) {
-    //     console.log("error verify", err);
-    //   } else {
-    //     console.log("decode verify", decode);
-    //   }
-    // });
 
     return { accessToken, refreshToken };
   } catch (err) {
@@ -30,4 +23,13 @@ const createTokenPair = async (payload, privateKey) => {
   }
 };
 
-module.exports = { createTokenPair };
+const verifyJWT = async (token, secretKey) => {
+  return await JWT.verify(token, secretKey);
+};
+
+const generateKeyPair = () => {
+  const publicKey = crypto.randomBytes(64).toString("hex");
+  const privateKey = crypto.randomBytes(64).toString("hex");
+  return { publicKey, privateKey };
+};
+module.exports = { createTokenPair, verifyJWT, generateKeyPair };

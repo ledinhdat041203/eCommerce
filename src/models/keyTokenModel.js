@@ -15,9 +15,17 @@ var keyTokenSchema = new Schema(
       type: String,
       unique: true,
     },
-    refreshToken: {
+    privateKey: {
+      type: String,
+      unique: true,
+    },
+    refreshTokensUsed: {
       type: Array,
       default: [],
+    },
+    refreshToken: {
+      type: String,
+      require: true,
     },
   },
   {
